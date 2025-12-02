@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="sparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22d3ee;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#67e8f9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a5f3fc;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="45" fill="#0f172a"/>
+  
+  <!-- Sparkle/Star shape -->
+  <g filter="url(#glow)" fill="url(#sparkle)">
+    <!-- Main 4-point star -->
+    <path d="M50 10 L54 42 L86 50 L54 58 L50 90 L46 58 L14 50 L46 42 Z"/>
+    
+    <!-- Small diagonal points -->
+    <path d="M50 25 L52 46 L73 27 L54 48 L75 50 L54 52 L73 73 L52 54 L50 75 L48 54 L27 73 L46 52 L25 50 L46 48 L27 27 L48 46 Z" opacity="0.6"/>
+  </g>
+  
+  <!-- Center dot -->
+  <circle cx="50" cy="50" r="4" fill="#ffffff"/>
+</svg>
