@@ -1,61 +1,63 @@
 // ============================================
-// RAG (Retrieval-Augmented Generation) SERVICE
+// RAG SERVICE - KEYWORD-BASED RETRIEVAL
 // ============================================
 
-import type { DocSection } from '@/types';
-import { extractKeywords, calculateRelevance } from '@/utils/keywords';
-import { DOCS_CONTENT } from '@/content/docsContent';
+import { DOCS_CONTENT, type DocSection } from '@/content/docsContent';
 import { CODEBASE_CONTENT } from '@/content/codebaseContent';
-import { config } from '@/config';
+import { extractKeywords } from '@/utils/keywords';
+
+const ALL_DOCS = [...DOCS_CONTENT, ...CODEBASE_CONTENT];
 
 /**
  * Retrieves relevant documentation sections based on a query
- * Uses keyword extraction and scoring
+ * Uses keyword matching with title weighting
  */
 export const retrieveContext = (query: string): DocSection[] => {
   const keywords = extractKeywords(query);
-  
+
   if (keywords.length === 0) {
     return [];
   }
 
-  return findRelevantContent(keywords);
+  // Score each document section
+  const scored = ALL_DOCS.map((doc) => {
+    const titleLower = doc.title.toLowerCase();
+    const contentLower = doc.content.toLowerCase();
+
+    let score = 0;
+
+    keywords.forEach((keyword) => {
+      // Title matches are worth more
+      if (titleLower.includes(keyword)) {
+        score += 3;
+      }
+      // Count content occurrences
+      const contentMatches = (
+        contentLower.match(new RegExp(keyword, 'g')) || []
+      ).length;
+      score += contentMatches;
+    });
+
+    return { doc, score };
+  });
+
+  // Sort by score and return top results
+  return scored
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 2)
+    .map((s) => s.doc);
 };
 
 /**
- * Finds and scores content matching the given keywords
+ * Formats context sections for inclusion in a prompt
  */
-const findRelevantContent = (keywords: string[]): DocSection[] => {
-  const { titleWeight, contentWeight, maxResults } = config.rag.keyword;
+export const formatContextForPrompt = (sections: DocSection[]): string => {
+  if (sections.length === 0) return '';
 
-  // Combine all content sources
-  const allContent: DocSection[] = [
-    ...DOCS_CONTENT,
-    ...CODEBASE_CONTENT.map((file) => ({
-      id: file.path,
-      title: `Code File: ${file.path}`,
-      content: file.content,
-      source: 'codebase' as const,
-    })),
-  ];
-
-  // Score each section
-  const scoredContent = allContent
-    .map((section) => ({
-      section,
-      score: calculateRelevance(
-        keywords,
-        section.title,
-        section.content,
-        titleWeight,
-        contentWeight
-      ),
-    }))
-    .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, maxResults);
-
-  return scoredContent.map(({ section }) => section);
+  return sections
+    .map((s) => `## ${s.title}\n${s.content}`)
+    .join('\n\n---\n\n');
 };
 
 /**
@@ -63,7 +65,7 @@ const findRelevantContent = (keywords: string[]): DocSection[] => {
  * Currently returns simulated responses
  */
 export const generateRAGResponse = (
-  query: string,
+  _query: string,
   context: DocSection[]
 ): string => {
   if (context.length === 0) {
@@ -80,15 +82,5 @@ export const generateRAGResponse = (
       ? primaryContent.substring(0, maxContentLength) + '...'
       : primaryContent;
 
-  return `Based on the documentation about "${sourceNames}":\n\n${truncatedContent}`;
-};
-
-/**
- * Adds training content to the RAG context
- */
-export const addTrainingContext = (
-  baseContext: DocSection[],
-  trainingContent: DocSection[]
-): DocSection[] => {
-  return [...baseContext, ...trainingContent];
+  return `Based on my documentation (${sourceNames}):\n\n${truncatedContent}\n\nWould you like me to elaborate on any part of this?`;
 };

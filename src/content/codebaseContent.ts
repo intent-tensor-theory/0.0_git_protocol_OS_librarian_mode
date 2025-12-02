@@ -3,105 +3,82 @@
 // ============================================
 // Key code files included in RAG context for technical questions
 
-export type CodeFile = {
-  path: string;
-  content: string;
-};
+import type { DocSection } from './docsContent';
 
-export const CODEBASE_CONTENT: CodeFile[] = [
+export const CODEBASE_CONTENT: DocSection[] = [
   {
-    path: 'librarian.config.ts',
-    content: `// The main configuration file for Librarian Protocol OS
-// Edit this single file to configure:
-// - Database provider (localStorage, Firebase, Supabase)
-// - AI provider (simulation, OpenAI, Anthropic, Google)
-// - RAG provider (keyword, Pinecone, Supabase vectors)
-// - Feature flags (auth, subscription, tabs)
-// - UI settings (modal size, theme, animations)
+    id: 'code-config',
+    title: 'librarian.config.ts - Main Configuration',
+    content: `The main configuration file for Librarian Protocol OS.
+Edit this single file to configure:
+- Database provider (localStorage, Firebase, Supabase)
+- AI provider (simulation, OpenAI, Anthropic, Google)
+- RAG provider (keyword, Pinecone)
+- Feature flags (auth, subscription)
+- UI settings (modal size, theme)
 
-export const LIBRARIAN_CONFIG = {
+Example configuration:
+export const librarianConfig = {
   database: { provider: 'localStorage' },
   ai: { provider: 'simulation' },
-  rag: { provider: 'keyword', keyword: { maxResults: 2 } },
-  features: { auth: false, protocolOS: true, training: true },
-  // ... more settings
+  rag: { provider: 'keyword', maxResults: 2 },
+  features: { auth: false, subscription: false },
 };`,
   },
   {
-    path: 'src/hooks/useLibrarian.ts',
-    content: `// Master state management hook
-// Combines all sub-hooks into a single interface
-// Manages: auth, conversations, folders, platforms, trainings, logs
+    id: 'code-hooks',
+    title: 'useLibrarian.ts - Master Hook',
+    content: `The master React hook that composes all state management.
+Combines: useAuth, useConversations, useProtocolOS, useTraining.
+Manages: logs, contacts, UI state (active tab, modal visibility).
+Returns everything needed for the entire application.
 
-// Returns everything needed to run the Librarian:
-// - Auth state and methods (login, logout, subscribe)
-// - Conversation CRUD operations
-// - Folder management
-// - Protocol OS platform/resource/handshake CRUD
-// - Training profile management
-// - Log access and clearing`,
+Usage:
+const librarian = useLibrarian();
+const { conversations, addMessage, platforms, logs } = librarian;`,
   },
   {
-    path: 'src/services/ragService.ts',
-    content: `// RAG (Retrieval-Augmented Generation) Service
-// Provides context to AI responses by searching documentation
+    id: 'code-rag',
+    title: 'ragService.ts - RAG Service',
+    content: `Keyword-based retrieval system for documentation.
+Functions:
+- retrieveContext(query): Finds relevant doc sections
+- formatContextForPrompt(sections): Formats for AI prompt
+- generateRAGResponse(query, context): Creates response
 
-// retrieveContext(query: string): DocSection[]
-// 1. Extracts keywords from query (removes stopwords)
-// 2. Searches docsContent and codebaseContent
-// 3. Scores matches (title matches weighted 3x)
-// 4. Returns top 2 most relevant sections
-
-// The AI uses these sections to generate informed responses`,
+Uses keyword matching with title weighting.
+Searches both DOCS_CONTENT and CODEBASE_CONTENT.`,
   },
   {
-    path: 'src/components/LibrarianModal.tsx',
-    content: `// The main modal component with 4 tabs
-// Tabs: Conversation, Sync (Protocol OS), Train, Human
+    id: 'code-protocols',
+    title: 'protocols.ts - Protocol Definitions',
+    content: `Defines all 14 supported API protocols:
+1. curl-default - Universal cURL passthrough
+2. oauth-pkce - OAuth 2.0 with PKCE
+3. oauth-auth-code - OAuth 2.0 Authorization Code
+4. oauth-implicit - OAuth 2.0 Implicit (legacy)
+5. client-credentials - OAuth 2.0 Client Credentials
+6. rest-api-key - REST with API Key
+7. basic-auth - HTTP Basic Authentication
+8. graphql - GraphQL queries/mutations
+9. websocket - WebSocket connections
+10. soap-xml - SOAP/XML services
+11. grpc-web - gRPC-Web protocol
+12. sse - Server-Sent Events
+13. github-direct - GitHub API shortcuts
+14. keyless-scraper - Public endpoint scraping
 
-// State management:
-// - activeSection: which tab is active
-// - isDropdownExpanded: tab-specific dropdown visibility
-// - globalIsConnected: Sentient vs Wizard mode
-
-// Each tab has:
-// - A dropdown control (expanded when clicking active tab)
-// - A main content panel`,
+Each protocol has: id, name, category, description, fields, whitepaper.`,
   },
   {
-    path: 'src/components/protocol/ProtocolOSPanel.tsx',
-    content: `// The Protocol OS panel for managing API connections
-// Hierarchical structure: Platform → Resource → Handshake
+    id: 'code-storage',
+    title: 'storage.ts - Storage Service',
+    content: `Abstraction layer for data persistence.
+Currently supports localStorage with structure ready for:
+- Firebase Firestore
+- Supabase PostgreSQL
 
-// Features:
-// - Create nested platform/resource/handshake in one flow
-// - 14 protocol types supported
-// - Live execution testing
-// - Persistent storage
-// - One-click rerun of saved handshakes`,
-  },
-  {
-    path: 'src/types/protocol.ts',
-    content: `// Protocol OS type definitions
-
-type Platform = {
-  id, serial, version, baseName,
-  url, description, documentationUrl, authNotes,
-  resources: Resource[]
-};
-
-type Resource = {
-  id, serial, version, baseName,
-  url, description, documentationUrl, notes,
-  handshakes: Handshake[]
-};
-
-type Handshake = {
-  id, serial, version, baseName,
-  protocol: ProtocolType,
-  config: Record<string, string>,
-  input: { model: string, dynamicText: string },
-  output?: { status, method, size, response }
-};`,
+Provides typed get/set operations with JSON serialization.
+All hooks use this service for persistence.`,
   },
 ];

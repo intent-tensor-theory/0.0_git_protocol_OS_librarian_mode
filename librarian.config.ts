@@ -1,35 +1,57 @@
 // ============================================
-// LIBRARIAN PROTOCOL OS - CONFIGURATION
+// LIBRARIAN CONFIGURATION
+// THE ONE FILE TO EDIT
 // ============================================
-// This is the ONE FILE you need to edit to configure your Librarian.
-// All other configuration is derived from this file.
 
-export const LIBRARIAN_CONFIG = {
-  // ==========================================
-  // APP IDENTITY
-  // ==========================================
-  app: {
-    name: 'Librarian Protocol OS',
-    version: '1.0.0',
-    description: 'Self-documenting RAG-powered AI assistant',
-  },
+export interface LibrarianConfig {
+  database: {
+    provider: 'localStorage' | 'firebase' | 'supabase';
+    firebaseConfig?: {
+      apiKey: string;
+      authDomain: string;
+      projectId: string;
+    };
+    supabaseConfig?: {
+      url: string;
+      anonKey: string;
+    };
+  };
+  ai: {
+    provider: 'simulation' | 'openai' | 'anthropic' | 'google';
+    apiKey?: string;
+    model?: string;
+  };
+  rag: {
+    provider: 'keyword' | 'pinecone';
+    pineconeConfig?: {
+      apiKey: string;
+      environment: string;
+      indexName: string;
+    };
+    maxResults: number;
+  };
+  features: {
+    auth: boolean;
+    subscription: boolean;
+  };
+}
 
+export const librarianConfig: LibrarianConfig = {
   // ==========================================
   // DATABASE CONFIGURATION
   // ==========================================
-  // Start with localStorage, swap to Firebase/Supabase when ready
   database: {
-    provider: 'localStorage' as const, // 'localStorage' | 'firebase' | 'supabase'
-    
-    // Uncomment when using Firebase
-    // firebase: {
+    provider: 'localStorage',
+    // Uncomment and configure for Firebase:
+    // provider: 'firebase',
+    // firebaseConfig: {
     //   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     //   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
     //   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
     // },
-    
-    // Uncomment when using Supabase
-    // supabase: {
+    // Uncomment and configure for Supabase:
+    // provider: 'supabase',
+    // supabaseConfig: {
     //   url: import.meta.env.VITE_SUPABASE_URL,
     //   anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
     // },
@@ -38,45 +60,33 @@ export const LIBRARIAN_CONFIG = {
   // ==========================================
   // AI PROVIDER CONFIGURATION
   // ==========================================
-  // Start with simulation, swap to real AI when ready
   ai: {
-    provider: 'simulation' as const, // 'simulation' | 'openai' | 'anthropic' | 'google'
-    
-    // Uncomment when using real AI
-    // openai: {
-    //   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-    //   model: 'gpt-4o',
-    // },
-    
-    // anthropic: {
-    //   apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY,
-    //   model: 'claude-3-opus-20240229',
-    // },
-    
-    // google: {
-    //   apiKey: import.meta.env.VITE_GOOGLE_AI_API_KEY,
-    //   model: 'gemini-pro',
-    // },
+    provider: 'simulation',
+    // Uncomment and configure for OpenAI:
+    // provider: 'openai',
+    // apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+    // model: 'gpt-4-turbo-preview',
+    // Uncomment and configure for Anthropic:
+    // provider: 'anthropic',
+    // apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY,
+    // model: 'claude-3-opus-20240229',
+    // Uncomment and configure for Google:
+    // provider: 'google',
+    // apiKey: import.meta.env.VITE_GOOGLE_AI_API_KEY,
+    // model: 'gemini-pro',
   },
 
   // ==========================================
   // RAG CONFIGURATION
   // ==========================================
-  // Start with keyword search, upgrade to vectors when ready
   rag: {
-    provider: 'keyword' as const, // 'keyword' | 'pinecone' | 'supabase-vectors'
-    
-    // Keyword search settings
-    keyword: {
-      maxResults: 2,
-      titleWeight: 3,
-      contentWeight: 1,
-    },
-    
-    // Uncomment when using Pinecone
-    // pinecone: {
+    provider: 'keyword',
+    maxResults: 2,
+    // Uncomment and configure for Pinecone:
+    // provider: 'pinecone',
+    // pineconeConfig: {
     //   apiKey: import.meta.env.VITE_PINECONE_API_KEY,
-    //   environment: import.meta.env.VITE_PINECONE_ENVIRONMENT,
+    //   environment: 'us-east-1-aws',
     //   indexName: 'librarian-docs',
     // },
   },
@@ -85,58 +95,27 @@ export const LIBRARIAN_CONFIG = {
   // FEATURE FLAGS
   // ==========================================
   features: {
-    // Auth & Subscription
-    auth: false,           // Enable login gate
-    subscription: false,   // Enable paywall after login
-    
-    // Tabs
-    conversation: true,    // Tab 1: AI Chat
-    protocolOS: true,      // Tab 2: API Handshakes
-    training: true,        // Tab 3: Custom Training
-    humanLogs: true,       // Tab 4: Application Logs
-    
-    // Extras
-    darkMode: true,        // Dark theme (glass aesthetic)
-    animations: true,      // Pulsating effects
+    auth: false,        // Set to true to enable login flow
+    subscription: false, // Set to true to require subscription
   },
+};
 
-  // ==========================================
-  // UI CONFIGURATION
-  // ==========================================
-  ui: {
-    // Librarian modal
-    modal: {
-      width: '640px',
-      maxHeight: '85vh',
-      position: 'right' as const, // 'right' | 'center' | 'left'
-    },
-    
-    // Floating icon
-    floatingIcon: {
-      position: 'bottom-right' as const,
-      size: '56px',
-      connectedEmoji: '✨',
-      disconnectedEmoji: '✨',
-    },
-    
-    // Theme
-    theme: {
-      accentColor: 'cyan',
-      glassOpacity: 0.1,
-    },
+// ==========================================
+// UI CONFIGURATION
+// ==========================================
+export const uiConfig = {
+  floatingIcon: {
+    position: 'bottom-right' as const,
+    size: 56,
+    icon: '✨',
   },
-
-  // ==========================================
-  // STORAGE KEYS
-  // ==========================================
-  storageKeys: {
-    platforms: 'librarian-protocol-os-platforms',
-    conversations: 'librarian-protocol-os-conversations',
-    folders: 'librarian-protocol-os-folders',
-    trainings: 'librarian-protocol-os-trainings',
-    contacts: 'librarian-protocol-os-contacts',
+  modal: {
+    width: 900,
+    height: 700,
   },
-} as const;
-
-// Type export for use throughout the app
-export type LibrarianConfig = typeof LIBRARIAN_CONFIG;
+  theme: {
+    primary: '#22d3ee',
+    glass: 'rgba(255, 255, 255, 0.05)',
+    glassBorder: 'rgba(255, 255, 255, 0.1)',
+  },
+};
