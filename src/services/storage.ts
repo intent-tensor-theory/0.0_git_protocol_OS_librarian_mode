@@ -1,100 +1,83 @@
 // ============================================
-// STORAGE SERVICE (localStorage abstraction)
+// STORAGE SERVICE - PERSISTENCE ABSTRACTION
 // ============================================
-// This can be swapped to Firebase/Supabase later
 
-import { storageKeys } from '@/config';
 import { logger } from './logger';
 
-/**
- * Generic storage interface
- * Allows easy swapping between localStorage, Firebase, Supabase
- */
-interface StorageService {
-  get<T>(key: string): T | null;
-  set<T>(key: string, value: T): void;
-  remove(key: string): void;
-  clear(): void;
-}
+// Storage keys
+const STORAGE_KEYS = {
+  conversations: 'librarian_conversations',
+  folders: 'librarian_folders',
+  platforms: 'librarian_platforms',
+  trainings: 'librarian_trainings',
+  contacts: 'librarian_contacts',
+  user: 'librarian_user',
+};
 
 /**
- * localStorage implementation
+ * Generic storage class that can be swapped between providers
  */
-class LocalStorageService implements StorageService {
-  get<T>(key: string): T | null {
+class StorageService<T> {
+  private key: string;
+
+  constructor(key: string) {
+    this.key = key;
+  }
+
+  getAll(): T[] {
     try {
-      const item = localStorage.getItem(key);
-      if (item === null) return null;
-      return JSON.parse(item) as T;
+      const data = localStorage.getItem(this.key);
+      return data ? JSON.parse(data) : [];
     } catch (error) {
-      logger.log('ERROR', `Failed to read from storage: ${key}`);
-      return null;
+      logger.log('ERROR', `Failed to read from storage: ${this.key}`);
+      return [];
     }
   }
 
-  set<T>(key: string, value: T): void {
+  save(items: T[]): void {
     try {
-      localStorage.setItem(key, JSON.stringify(value));
+      localStorage.setItem(this.key, JSON.stringify(items));
+      logger.log('INFO', `Saved ${items.length} items to ${this.key}`);
     } catch (error) {
-      logger.log('ERROR', `Failed to write to storage: ${key}`);
+      logger.log('ERROR', `Failed to save to storage: ${this.key}`);
     }
   }
 
-  remove(key: string): void {
-    try {
-      localStorage.removeItem(key);
-    } catch (error) {
-      logger.log('ERROR', `Failed to remove from storage: ${key}`);
+  getById(id: string): T | undefined {
+    const items = this.getAll();
+    return items.find((item: any) => item.id === id);
+  }
+
+  add(item: T): void {
+    const items = this.getAll();
+    items.push(item);
+    this.save(items);
+  }
+
+  update(id: string, updates: Partial<T>): void {
+    const items = this.getAll();
+    const index = items.findIndex((item: any) => item.id === id);
+    if (index !== -1) {
+      items[index] = { ...items[index], ...updates };
+      this.save(items);
     }
+  }
+
+  delete(id: string): void {
+    const items = this.getAll();
+    const filtered = items.filter((item: any) => item.id !== id);
+    this.save(filtered);
   }
 
   clear(): void {
-    try {
-      // Only clear our keys, not all localStorage
-      Object.values(storageKeys).forEach((key) => {
-        localStorage.removeItem(key);
-      });
-    } catch (error) {
-      logger.log('ERROR', 'Failed to clear storage');
-    }
+    localStorage.removeItem(this.key);
   }
 }
 
-// Export singleton instance
-export const storage = new LocalStorageService();
-
-// ============================================
-// TYPED STORAGE HELPERS
-// ============================================
-
-import type { Platform, Conversation, Folder, Training, Contact } from '@/types';
-
-export const platformStorage = {
-  get: (): Platform[] => storage.get<Platform[]>(storageKeys.platforms) || [],
-  set: (platforms: Platform[]) => storage.set(storageKeys.platforms, platforms),
-  clear: () => storage.remove(storageKeys.platforms),
-};
-
-export const conversationStorage = {
-  get: (): Conversation[] => storage.get<Conversation[]>(storageKeys.conversations) || [],
-  set: (conversations: Conversation[]) => storage.set(storageKeys.conversations, conversations),
-  clear: () => storage.remove(storageKeys.conversations),
-};
-
-export const folderStorage = {
-  get: (): Folder[] => storage.get<Folder[]>(storageKeys.folders) || [],
-  set: (folders: Folder[]) => storage.set(storageKeys.folders, folders),
-  clear: () => storage.remove(storageKeys.folders),
-};
-
-export const trainingStorage = {
-  get: (): Training[] => storage.get<Training[]>(storageKeys.trainings) || [],
-  set: (trainings: Training[]) => storage.set(storageKeys.trainings, trainings),
-  clear: () => storage.remove(storageKeys.trainings),
-};
-
-export const contactStorage = {
-  get: (): Contact[] => storage.get<Contact[]>(storageKeys.contacts) || [],
-  set: (contacts: Contact[]) => storage.set(storageKeys.contacts, contacts),
-  clear: () => storage.remove(storageKeys.contacts),
-};
+// Export storage instances
+export const conversationStorage = new StorageService(STORAGE_KEYS.conversations);
+export const folderStorage = new StorageService(STORAGE_KEYS.folders);
+export const platformStorage = new StorageService(STORAGE_KEYS.platforms);
+export const trainingStorage = new StorageService(STORAGE_KEYS.trainings);
+export const contactStorage = new StorageService(STORAGE_KEYS.contacts);
+export const userStorage = new StorageService(STORAGE_KEYS.user);
