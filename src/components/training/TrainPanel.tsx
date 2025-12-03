@@ -83,7 +83,7 @@ export const TrainPanel: React.FC<TrainPanelProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-3 flex-shrink-0">
         <span className="text-xs text-gray-500">
-          {trainings.length} profiles •{' '}
+          {(trainings || []).length} profiles •{' '}
           {activeTrainingId ? 'Profile active' : 'No active profile'}
         </span>
         {!isEditing && (
@@ -100,7 +100,7 @@ export const TrainPanel: React.FC<TrainPanelProps> = ({
             {/* Editor Header */}
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-cyan-300">
-                {editingTraining.id && trainings.find((t) => t.id === editingTraining.id)
+                {editingTraining.id && (trainings || []).find((t) => t.id === editingTraining.id)
                   ? 'Edit Profile'
                   : 'New Profile'}
               </h3>
@@ -116,7 +116,7 @@ export const TrainPanel: React.FC<TrainPanelProps> = ({
             />
 
             {/* Knowledge Vault */}
-            {editingTraining.id && trainings.find((t) => t.id === editingTraining.id) && (
+            {editingTraining.id && (trainings || []).find((t) => t.id === editingTraining.id) && (
               <KnowledgeVault
                 files={editingTraining.knowledgeFiles || []}
                 onAddFile={(file) => addKnowledgeFile(editingTraining.id, file)}
@@ -138,7 +138,7 @@ export const TrainPanel: React.FC<TrainPanelProps> = ({
               </GlassButton>
             </div>
           </GlassPane>
-        ) : trainings.length === 0 ? (
+        ) : (trainings || []).length === 0 ? (
           <GlassPane className="text-center py-12">
             <div className="text-5xl mb-4">🧠</div>
             <h3 className="text-lg font-bold text-white mb-2">
@@ -154,7 +154,7 @@ export const TrainPanel: React.FC<TrainPanelProps> = ({
           </GlassPane>
         ) : (
           <div className="space-y-3">
-            {trainings.map((training) => (
+            {(trainings || []).map((training) => (
               <TrainingCard
                 key={training.id}
                 training={training}
