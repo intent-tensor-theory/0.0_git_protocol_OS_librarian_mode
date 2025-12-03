@@ -189,7 +189,12 @@ export const LibrarianModal: React.FC<LibrarianModalProps> = (props) => {
             />
           )}
           {activeSection === 'Human' && (
-            <HumanPanel logs={props.logs} clearLogs={props.clearLogs} />
+            <HumanPanel
+              logs={props.logs}
+              contacts={props.contacts}
+              saveContact={props.saveContact}
+              deleteContact={props.deleteContact}
+            />
           )}
         </div>
       </GlassPane>
