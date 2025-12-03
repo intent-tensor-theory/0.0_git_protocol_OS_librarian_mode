@@ -2,6 +2,8 @@
 
 A self-documenting AI assistant with universal API connectivity. Built with React, TypeScript, and a glass morphism design system.
 
+https://render-protocol-os-librarian.onrender.com/
+
 ## Overview
 
 Librarian Protocol OS is a floating modal interface that provides:
