@@ -4,6 +4,10 @@ A self-documenting AI assistant with universal API connectivity. Built with Reac
 
 https://render-protocol-os-librarian.onrender.com/
 
+
+<img width="792" height="981" alt="image" src="https://github.com/user-attachments/assets/4fa80025-fc9c-4ca0-bb1d-5db7be8fbaef" />
+
+
 ## Overview
 
 Librarian Protocol OS is a floating modal interface that provides:
