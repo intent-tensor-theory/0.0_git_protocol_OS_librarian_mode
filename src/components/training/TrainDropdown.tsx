@@ -14,7 +14,7 @@ export const TrainDropdown: React.FC<TrainDropdownProps> = ({
   trainings,
   activeTrainingId,
 }) => {
-  const activeTraining = trainings.find((t) => t.id === activeTrainingId);
+  const activeTraining = (trainings || []).find((t) => t.id === activeTrainingId);
 
   return (
     <div className="space-y-4">
@@ -50,12 +50,12 @@ export const TrainDropdown: React.FC<TrainDropdownProps> = ({
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="p-3 bg-white/5 rounded-lg">
-          <p className="text-2xl font-bold text-cyan-300">{trainings.length}</p>
+          <p className="text-2xl font-bold text-cyan-300">{(trainings || []).length}</p>
           <p className="text-xs text-gray-400">Profiles</p>
         </div>
         <div className="p-3 bg-white/5 rounded-lg">
           <p className="text-2xl font-bold text-purple-300">
-            {trainings.reduce(
+            {(trainings || []).reduce(
               (acc, t) => acc + (t.knowledgeFiles?.length || 0),
               0
             )}
