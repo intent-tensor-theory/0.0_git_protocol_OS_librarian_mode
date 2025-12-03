@@ -24,6 +24,10 @@ class StorageService<T> {
     this.key = key;
   }
 
+  get(): T[] {
+    return this.getAll();
+  }
+
   getAll(): T[] {
     try {
       const data = localStorage.getItem(this.key);
