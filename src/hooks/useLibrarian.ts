@@ -10,7 +10,7 @@ import { useConversations } from './useConversations';
 import { useProtocolOS } from './useProtocolOS';
 import { useTraining } from './useTraining';
 import { logger } from '@/services/logger';
-import { features } from '@/config';
+import { librarianConfig } from '@/config';
 
 export const useLibrarian = () => {
   // ==========================================
@@ -51,7 +51,7 @@ export const useLibrarian = () => {
   // ==========================================
   // AUTH OVERRIDE (when auth is disabled)
   // ==========================================
-  const effectiveAuthStatus = features.auth ? auth.authStatus : 'loggedIn';
+  const effectiveAuthStatus = librarianConfig.features.auth ? auth.authStatus : 'loggedIn';
 
   // ==========================================
   // RETURN UNIFIED API
@@ -77,7 +77,7 @@ export const useLibrarian = () => {
     login: auth.login,
     subscribe: auth.subscribe,
     logout: auth.logout,
-    isLoggedIn: auth.isLoggedIn || !features.auth,
+    isLoggedIn: auth.isLoggedIn || !librarianConfig.features.auth,
     
     // ---- Conversations (from useConversations) ----
     chatMessages: conversations.chatMessages,
