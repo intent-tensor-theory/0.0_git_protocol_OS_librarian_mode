@@ -116,6 +116,7 @@ export const useLibrarian = () => {
     addKnowledgeFile: training.addKnowledgeFile,
     removeKnowledgeFile: training.removeKnowledgeFile,
     saveContact: training.saveContact,
+    deleteContact: training.deleteContact,
   };
 };
 
