@@ -37,8 +37,8 @@ export const HumanPanel: React.FC<HumanPanelProps> = ({
 
   // Filter logs by type
   const filteredLogs = filterType
-    ? logs.filter((log) => log.type === filterType)
-    : logs;
+    ? (logs || []).filter((log) => log.type === filterType)
+    : (logs || []);
 
   const handleExportLogs = () => {
     const text = logger.formatForExport();
@@ -72,7 +72,7 @@ export const HumanPanel: React.FC<HumanPanelProps> = ({
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            📋 Logs ({logs.length})
+            📋 Logs ({(logs || []).length})
           </button>
           <button
             onClick={() => setActiveTab('contacts')}
@@ -82,7 +82,7 @@ export const HumanPanel: React.FC<HumanPanelProps> = ({
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            👥 Contacts ({contacts.length})
+            👥 Contacts ({(contacts || []).length})
           </button>
         </div>
 
