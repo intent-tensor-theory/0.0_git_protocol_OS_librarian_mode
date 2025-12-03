@@ -15,7 +15,7 @@ export const HumanDropdown: React.FC<HumanDropdownProps> = ({
   contacts,
 }) => {
   // Count logs by type
-  const logCounts = logs.reduce((acc, log) => {
+  const logCounts = (logs || []).reduce((acc, log) => {
     acc[log.type] = (acc[log.type] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -35,17 +35,17 @@ export const HumanDropdown: React.FC<HumanDropdownProps> = ({
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="p-3 bg-white/5 rounded-lg">
-          <p className="text-2xl font-bold text-cyan-300">{logs.length}</p>
+          <p className="text-2xl font-bold text-cyan-300">{(logs || []).length}</p>
           <p className="text-xs text-gray-400">Log Entries</p>
         </div>
         <div className="p-3 bg-white/5 rounded-lg">
-          <p className="text-2xl font-bold text-purple-300">{contacts.length}</p>
+          <p className="text-2xl font-bold text-purple-300">{(contacts || []).length}</p>
           <p className="text-xs text-gray-400">Contacts</p>
         </div>
       </div>
 
       {/* Log Type Breakdown */}
-      {logs.length > 0 && (
+      {(logs || []).length > 0 && (
         <div className="space-y-2">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
             Log Breakdown
